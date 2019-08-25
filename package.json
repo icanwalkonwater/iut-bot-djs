@@ -1,9 +1,20 @@
 {
     "name": "iut-bot-djs",
     "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "scripts": {},
+    "description": "Discord.js bot used for a private discord server",
+    "private": true,
+    "scripts": {
+        "lint": "eslint --fix src/",
+        "predev": "npm run lint",
+        "dev": "webpack --config webpack.dev.js",
+        "dev:watch": "webpack --config webpack.dev.js --watch",
+        "dev:start": "nodemon --signal SIGHUP dist/main.js",
+        "watch": "npm-run-all -p dev:watch dev:start",
+        "prebuild": "npm run lint",
+        "build": "webpack --config webpack.prod.js",
+        "prestart": "npm run build",
+        "start": "node dist/main.js"
+    },
     "husky": {
         "hooks": {
             "pre-commit": "pretty-quick --staged"
@@ -14,7 +25,7 @@
         "url": "git+https://github.com/icanwalkonwater/iut-bot-djs.git"
     },
     "keywords": [],
-    "author": "",
+    "author": "ICanWalkOnWater",
     "license": "Apache-2.0",
     "bugs": {
         "url": "https://github.com/icanwalkonwater/iut-bot-djs/issues"
@@ -30,7 +41,10 @@
     },
     "devDependencies": {
         "@babel/core": "^7.5.5",
+        "@babel/plugin-proposal-optional-chaining": "^7.2.0",
+        "@babel/plugin-proposal-throw-expressions": "^7.2.0",
         "@babel/preset-env": "^7.5.5",
+        "@types/signale": "^1.2.1",
         "babel-eslint": "^10.0.2",
         "babel-loader": "^8.0.6",
         "clean-webpack-plugin": "^3.0.0",
