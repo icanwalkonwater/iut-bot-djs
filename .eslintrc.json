@@ -1,0 +1,13 @@
+{
+    "parser": "babel-eslint",
+    "extends": ["plugin:prettier/recommended"],
+    "env": {
+        "commonjs": true,
+        "es6": true,
+        "node": true
+    },
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    }
+}
