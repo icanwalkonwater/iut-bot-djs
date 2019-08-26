@@ -5,6 +5,7 @@ const {
     RouteMismatchError,
     CommandNotFoundError
 } = require('./commands/errors');
+const { createErrorMessage } = require('./messageUtils');
 const commandProcessor = require('./commands/commandProcessor');
 const commandRegistry = require('./commands/commandRegistry');
 
@@ -15,34 +16,46 @@ for (let command of commandRegistry) {
 }
 
 module.exports = client => {
+    // Command listener
     client.on('message', msg => {
         // Ignore bot message, including self
-        if (msg.author.bot) {
-            return;
-        }
+        if (msg.author.bot) return;
 
-        // Check if command
-
-        // TODO: put into config
-        const commandPrefix = '!';
-        if (msg.content.startsWith(commandPrefix)) {
-            const raw = msg.content.slice(commandPrefix.length);
+        if (msg.content.startsWith(process.env.COMMAND_PREFIX)) {
+            const raw = msg.content.slice(process.env.COMMAND_PREFIX.length);
 
             try {
                 // Process command
-                const { executor, args } = commandProcessor.parse(msg, raw);
+                const { executor, args, options } = commandProcessor.parse(
+                    msg,
+                    raw
+                );
+
                 // Execute the command
-                executor(...args);
+                signale.info(
+                    `Command (${msg.author.tag} ${msg.author.id}): ${msg.content}`
+                );
+                executor(msg, ...args, options);
             } catch (e) {
-                if (
-                    e instanceof CommandNotFoundError ||
-                    e instanceof RouteMismatchError
-                ) {
-                    msg.reply(`An error occured: ${e.message || e}`);
+                if (e instanceof CommandNotFoundError) {
+                    // Silently ignore
+                    return;
+                } else if (e instanceof RouteMismatchError) {
+                    msg.channel.send(
+                        createErrorMessage(
+                            'No route found, check your arguments again'
+                        )
+                    );
+                    return;
                 }
 
-                throw e;
+                // Real error, log it
+                signale.error(e);
             }
         }
+    });
+
+    client.on('guildMemberAdd', member => {
+        if (member.guild.id !== process.env.GUILD_ID) return;
     });
 };

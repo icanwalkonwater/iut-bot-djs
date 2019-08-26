@@ -1,62 +1,39 @@
 /** @format */
 
+const { Command } = require('./Command');
 const { group } = require('./commandProcessor');
+const { createInfoMessage } = require('../messageUtils');
 
-class TestCommand {
+class TestCommand extends Command {
     constructor() {
-        this.name = ['test', 't'];
-        this.description = 'Test command';
+        super(['test', 't'], 'Test command', TestCommand.prototype.execute);
 
-        this.executor = {
-            executor: this.execute,
-            children: [
-                group(/get/i, this.getExecutor),
-                group(/add/i, undefined, group(/(\S+)/, this.addExecutor)),
-                group(
-                    /set/i,
-                    undefined,
-                    group(/(\w+)/, undefined, group(/(\d+)/, this.setExecutor))
-                )
-            ]
-        };
+        this.addExecutorMapping(/get/i, TestCommand.prototype.getExecutor);
+        this.addExecutorMapping(
+            group(/add/, /(\S+)/),
+            TestCommand.prototype.addExecutor
+        );
+        this.addExecutorMapping(
+            group(/set/, /(\w+)/, /(\d+)/),
+            TestCommand.prototype.setExecutor
+        );
     }
 
     execute(msg) {
-        msg.reply('No args');
+        msg.channel.send(createInfoMessage('No args'));
     }
 
     getExecutor(msg) {
-        msg.reply('Get');
+        msg.channel.send(createInfoMessage('Get'));
     }
 
     addExecutor(msg, arg) {
-        msg.reply(`Add ${arg}`);
+        msg.channel.send(createInfoMessage(`Add ${arg}`));
     }
 
     setExecutor(msg, key, val) {
-        msg.reply(`Set ${key} to ${val}`);
+        msg.channel.send(createInfoMessage(`Set ${key} to ${val}`));
     }
 }
-
-/*
-const executeSub = msg => {
-    msg.reply('sub1');
-};
-
-const executeSub2 = (msg, arg) => {
-    msg.reply(`sub2: ${arg}`);
-};
-const old = {
-    name: ['test', 't'],
-    description: 'Test command',
-    executor: {
-        executor: execute,
-        children: [
-            group(/get/i, executeSub),
-            group(/add\s+(\S+)/i, executeSub2),
-            group(/set/, undefined, [group(/(\w+) (\d+)/, undefined)])
-        ]
-    }
-};*/
 
 module.exports = new TestCommand();

@@ -1,5 +1,6 @@
 /** @format */
 
+const signale = require('signale');
 const { RouteMismatchError, CommandNotFoundError } = require('./errors');
 
 const commandMap = new Map();
@@ -10,6 +11,7 @@ const commandMap = new Map();
  * @param command - The command to register
  */
 const register = command => {
+    // Register every aliases of the command
     if (Array.isArray(command.name)) {
         command.name.forEach(n => commandMap.set(n, command));
     } else {
@@ -18,35 +20,16 @@ const register = command => {
 };
 
 /**
- * Utility method to generate complex sub command paths.
- * Can be chained.
+ * Utility method to group multiple regex separated by any number of whitespaces.
+ * This method exist to avoid redundancy.
  *
- * @param regex - The grammar of the command section
- * @param executor - The executor associated with this path
- * @param children - The child groups, can be dynamically created by chaning group() functions.
+ * @param patterns - The patterns to concatenate
  */
-const group = (regex, executor, children = []) => {
-    // Create the basic props
-    const groupCreator = (r, e, c) => ({
-        test: r,
-        executor: e,
-        children: c
-    });
-
-    // Allow easy to use command grouping
-    const recurser = (r, e, c = []) => {
-        const subGroup = groupCreator(r, e, c);
-        subGroup.group = recurser.bind(subGroup);
-
-        console.log(this.constructor);
-        this.children.push(subGroup);
-        return subGroup;
-    };
-
-    const rootGroup = groupCreator(regex, executor, children);
-    rootGroup.group = recurser.bind(rootGroup);
-    return rootGroup;
+const group = (...patterns) => {
+    const combined = patterns.map(p => p.source).join(groupSeparator);
+    return new RegExp(combined, 'i');
 };
+const groupSeparator = /\s+/.source;
 
 /**
  * Parse a raw message into an executor and a list of parsed arguments.
@@ -54,10 +37,13 @@ const group = (regex, executor, children = []) => {
  *
  * @param msg - The message event
  * @param raw - The starting message
- * @returns {boolean|{args: Array, executor: Function}}
+ * @return {{args: *, executor: *, options: *}}
+ * @throws CommandNotFoundError When the command can't be found in the registry.
+ * @throws RouteMismatchError If the message can't be associated with any route.
  */
 const parse = (msg, raw) => {
-    const commandName = raw.split(' ', 1)[0];
+    // Split at the first whitespace
+    const commandName = raw.split(/\s/, 1)[0];
 
     // Check and retrieve command
     const command = commandMap.get(commandName);
@@ -71,45 +57,56 @@ const parse = (msg, raw) => {
     // Collect options
     // One character options: short options
     // Other ones: long options
-    const regex = /\s-(?:(\w)|-(\w{2,}))/g;
-    const options = [
-        ...(function*() {
-            let match;
-            while ((match = regex.exec(raw)) !== null) {
-                yield match[1];
+    const regex = /(?:\s|^)-(?:(\w)|-(\w{2,}))(?:=(\w+))?/g;
+    const collector = function*() {
+        let match;
+        while ((match = regex.exec(raw)) !== null) {
+            // Group 1 is short option
+            // Group 2 is long option
+            // Group 3 is argument
+            const optName = match[1] || match[2];
+
+            if (match[3]) {
+                yield { [optName]: match[3] };
+            } else {
+                yield { [optName]: true };
             }
-        })()
-    ].map(o => o.toLowerCase());
+        }
+    };
+
+    let options = [...collector()];
+    if (options.length) {
+        options.reduce((prev, next) => {
+            return { ...prev, ...next };
+        });
+    }
 
     // And strip them
     raw = raw.replace(regex, '').trim();
 
-    // If no args
+    // No args
     if (!raw.length) {
-        const defaultExecutor = command.executor.executor;
-
-        if (typeof defaultExecutor === 'function') {
-            defaultExecutor(msg);
+        if (typeof command.rootExecutor === 'function') {
+            return { executor: command.rootExecutor, args: [], options };
         } else {
             throw new RouteMismatchError(
-                'This command likely need some arguments'
+                'No root executor found for this command !'
             );
         }
-    } else if (Array.isArray(command.executor.children)) {
-        for (let child of command.executor.children) {
-            const res = walkChildren(msg, raw, child);
-
-            // If res is successful, stop there
-            if (res !== false) {
-                return res;
-            }
-        }
-
-        // No matches
-        throw new RouteMismatchError(
-            'No route can be found for the current argument set'
-        );
     }
+
+    // Has args
+    // Walk through routes until a match is found
+    for (const [regex, executor] of command.executorMap) {
+        const match = regex.exec(raw);
+        if (match !== null) {
+            // It's a match
+            return { executor, args: match.slice(1), options };
+        }
+    }
+
+    // No matches
+    throw new RouteMismatchError('No route found for these arguments !');
 };
 
 // Internal function

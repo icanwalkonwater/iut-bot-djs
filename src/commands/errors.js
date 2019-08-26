@@ -14,5 +14,6 @@ class RouteMismatchError extends Error {
 
 module.exports = {
     CommandNotFoundError,
-    RouteMismatchError
+    RouteMismatchError,
+    permissionError: new Error('Unsuffisent permissions')
 };

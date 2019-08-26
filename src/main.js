@@ -1,5 +1,6 @@
 /** @format */
 
+require('dotenv').config();
 const signale = require('signale');
 const Discord = require('discord.js');
 
