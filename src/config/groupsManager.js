@@ -2,6 +2,8 @@
 
 const { createInfoMessage } = require('../messageUtils');
 
+// Setup groups
+
 const groups = process.env.GROUPS.split(',').map(g => g.toUpperCase());
 const groupsMap = new Map();
 
@@ -10,22 +12,7 @@ groups.forEach(id => {
     groupsMap.set(id, { channelId, roleId });
 });
 
-const joinHook = async (member, groupId) => {
-    const client = member.client;
-    const { channelId, roleId } = groupsMap.get(groupId);
-
-    const channel = client.channels.get(channelId);
-
-    // Apply to discord
-    return await Promise.all([
-        member.addRole(roleId),
-        channel.send(
-            createInfoMessage(
-                `${member.displayName} viens de rejoindre ce groupe !`
-            )
-        )
-    ]);
-};
+// Functions
 
 const getGroupIds = () => {
     return groups;
@@ -33,6 +20,7 @@ const getGroupIds = () => {
 
 // Reverse map (with cache)
 let groupIds = undefined;
+
 const getGroupRoleIds = () => {
     if (groupIds === undefined) {
         groupIds = Array.from(groupsMap.values()).map(({ roleId }) => roleId);
@@ -40,7 +28,6 @@ const getGroupRoleIds = () => {
 
     return groupIds;
 };
-
 const joinGroup = async (user, groupId) => {
     // Sanitize
     groupId = groupId.toUpperCase();
@@ -58,7 +45,24 @@ const joinGroup = async (user, groupId) => {
     }
 
     // Trigger discord-side logic
-    return await joinHook(member, groupId);
+    return await joinDiscordHook(member, groupId);
+};
+
+const joinDiscordHook = async (member, groupId) => {
+    const client = member.client;
+    const { channelId, roleId } = groupsMap.get(groupId);
+
+    const channel = client.channels.get(channelId);
+
+    // Apply to discord
+    return await Promise.all([
+        member.addRole(roleId),
+        channel.send(
+            createInfoMessage(
+                `${member.displayName} viens de rejoindre ce groupe !`
+            )
+        )
+    ]);
 };
 
 module.exports = {

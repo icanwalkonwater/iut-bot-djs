@@ -22,6 +22,9 @@ client.once('ready', () => {
     signale.success('Ready !');
 });
 
+// Start redis client
+require('./config/storage');
+
 // Start bot
 const token = process.env.TOKEN || throw Error('No token provided !');
 

@@ -43,7 +43,7 @@ const parse = (msg, raw) => {
     raw = raw.slice(commandName.length).trimLeft();
 
     // Collect options
-    // One character options: short options
+    // One character options: short options (no args)
     // Other ones: long options
     const regex = /(?:\s|^)-(?:(\w)|-(\w{2,}))(?:=(\w+))?/g;
     const collector = function*() {

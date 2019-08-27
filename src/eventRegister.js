@@ -8,6 +8,7 @@ const {
 const { createErrorMessage } = require('./messageUtils');
 const commandProcessor = require('./commands/commandProcessor');
 const commandRegistry = require('./commands/commandRegistry');
+const { fetchUserSettings } = require('./config/storage');
 const welcomeForm = require('./forms/welcomeForm');
 
 // ***** Side effect *****
@@ -22,6 +23,7 @@ module.exports = client => {
         // Ignore bot message, including self
         if (msg.author.bot) return;
 
+        // If is a command-like message
         if (msg.content.startsWith(process.env.COMMAND_PREFIX)) {
             const raw = msg.content.slice(process.env.COMMAND_PREFIX.length);
 
@@ -67,8 +69,12 @@ module.exports = client => {
         }
     });
 
+    // Welcome form
     client.on('guildMemberAdd', async member => {
         if (member.guild.id !== process.env.GUILD_ID) return;
+
+        // Check if already exists in the DB
+        if (await fetchUserSettings(member.id)) return;
 
         // Trigger welcome form
         await welcomeForm(

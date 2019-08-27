@@ -24,13 +24,17 @@ client.on('error', error => {
     signale.error(error);
 });
 
-// Promisify the used cb methods
+// Promisify the used methods
 const get = promisify(client.get).bind(client);
 const del = promisify(client.del).bind(client);
 const incr = promisify(client.incr).bind(client);
+// Hash sets
 const hgetall = promisify(client.hgetall).bind(client);
-const lpush = promisify(client.lpush).bind(client);
-const lrange = promisify(client.lrange).bind(client);
+const hmset = promisify(client.hmset).bind(client);
+// Sets
+const sadd = promisify(client.sadd).bind(client);
+const smembers = promisify(client.smembers).bind(client);
+const srem = promisify(client.srem).bind(client);
 
 // *** User settings ***
 
@@ -56,43 +60,56 @@ const groupKey = id => {
     return `group:${id}`;
 };
 
-const groupNameKey = id => {
-    return `${groupKey(id)}:name`;
+const groupSettingsKey = id => {
+    return `${groupKey(id)}:setting`;
 };
 
 const groupMembersKey = id => {
     return `${groupKey(id)}:members`;
 };
 
-const groupLastIdKey = 'group:last';
+const groupLastIdKey = groupKey('last');
 
-const fetchGroupNextId = /*async*/ () => {
-    // Return the next id stored, fallback to 0
-    return get(groupLastIdKey).then(id => +id, err => 0);
+const fetchNextGroupId = /*async*/ () => {
+    // Return the next id stored
+    return incr(groupLastIdKey).then(id => +id);
 };
 
 const fetchGroup = /*async*/ id => {
     return Promise.all([
-        get(groupNameKey(id)),
-        lrange(groupMembersKey(id), 0, -1)
-    ]).then(([name, members]) => {
-        return { name, members };
+        hgetall(groupSettingsKey(id)),
+        smembers(groupMembersKey(id))
+    ]).then(([settings, members]) => {
+        return { settings, members };
     });
 };
 
-const commitGroup = /*async*/ group => {
+const commitNewGroup = async (settings, members) => {
     // No validation, beware
-    return fetchGroupNextId().then(id => {
-        return Promise.all([
-            incr(groupLastIdKey),
-            set(groupNameKey(id), group.name),
-            lpush(groupMembersKey(id), group.members)
-        ]);
-    });
+    const id = await fetchNextGroupId();
+
+    await Promise.all([
+        hmset(groupSettingsKey(id), settings),
+        members.length ? sadd(groupMembersKey(id), members) : Promise.resolve()
+    ]);
+
+    return id;
+};
+
+const commitGroupSettings = /*async*/ (id, settings) => {
+    return hmset(groupSettingsKey(id), settings);
+};
+
+const addGroupMembers = /*async*/ (id, members) => {
+    return sadd(groupMembersKey(id), members);
+};
+
+const removeGroupMembers = /*async*/ (id, members) => {
+    return srem(groupMembersKey(id), members);
 };
 
 const deleteGroup = /*async*/ id => {
-    return Promise.all([del(groupNameKey(id)), del(groupMembersKey(id))]);
+    return Promise.all([del(groupSettingsKey(id)), del(groupMembersKey(id))]);
 };
 
 module.exports = {
@@ -103,6 +120,9 @@ module.exports = {
     deleteUserSettings,
 
     fetchGroup,
-    commitGroup,
+    commitNewGroup,
+    commitGroupSettings,
+    addGroupMembers,
+    removeGroupMembers,
     deleteGroup
 };

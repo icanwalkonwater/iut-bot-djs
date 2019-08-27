@@ -129,6 +129,7 @@ const createDetailedErrorMessage = (title, error) => {
 
 const whiteCheckMark = '\u2705';
 const noEntrySign = '\uD83D\uDEAB';
+const smallBlueDiamond = '\uD83D\uDD39';
 
 module.exports = {
     createSmallMessage,
@@ -146,5 +147,6 @@ module.exports = {
     createDetailedErrorMessage,
 
     whiteCheckMark,
-    noEntrySign
+    noEntrySign,
+    smallBlueDiamond
 };
