@@ -2,7 +2,7 @@
 
 const { Command } = require('./Command');
 const { createInfoMessageWithTitle } = require('../messageUtils');
-const { getGroupIds } = require('../groupsManager');
+const { getGroupIds } = require('../config/groupsManager');
 
 class GroupCommand extends Command {
     constructor() {

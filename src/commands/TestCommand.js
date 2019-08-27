@@ -1,21 +1,18 @@
 /** @format */
 
 const { Command } = require('./Command');
-const { group } = require('./commandProcessor');
+const { group } = require('./commandUtils');
 const { createInfoMessage } = require('../messageUtils');
 
 class TestCommand extends Command {
     constructor() {
         super(['test', 't'], 'Test command', TestCommand.prototype.execute);
 
-        this.addExecutorMapping(/get/i, TestCommand.prototype.getExecutor);
-        this.addExecutorMapping(
-            group(/add/, /(\S+)/),
-            TestCommand.prototype.addExecutor
-        );
+        this.addExecutorMapping(/get/i, this.getExecutor);
+        this.addExecutorMapping(group(/add/, /(\S+)/), this.addExecutor);
         this.addExecutorMapping(
             group(/set/, /(\w+)/, /(\d+)/),
-            TestCommand.prototype.setExecutor
+            this.setExecutor
         );
     }
 

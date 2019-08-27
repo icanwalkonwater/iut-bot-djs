@@ -20,18 +20,6 @@ const register = command => {
 };
 
 /**
- * Utility method to group multiple regex separated by any number of whitespaces.
- * This method exist to avoid redundancy.
- *
- * @param patterns - The patterns to concatenate
- */
-const group = (...patterns) => {
-    const combined = patterns.map(p => p.source).join(groupSeparator);
-    return new RegExp(combined, 'i');
-};
-const groupSeparator = /\s+/.source;
-
-/**
  * Parse a raw message into an executor and a list of parsed arguments.
  * Return false if no executor can be match anywhere.
  *
@@ -43,7 +31,7 @@ const groupSeparator = /\s+/.source;
  */
 const parse = (msg, raw) => {
     // Split at the first whitespace
-    const commandName = raw.split(/\s/, 1)[0];
+    const commandName = raw.split(/\s/, 1)[0].toLowerCase();
 
     // Check and retrieve command
     const command = commandMap.get(commandName);
@@ -109,51 +97,7 @@ const parse = (msg, raw) => {
     throw new RouteMismatchError('No route found for these arguments !');
 };
 
-// Internal function
-const walkChildren = (msg, raw, executor) => {
-    let regex = executor.test;
-    // Match only from the start of the string
-    regex = new RegExp(`^${regex.source}`);
-
-    const match = regex.exec(raw);
-
-    if (!match) {
-        // No match, continue
-        return false;
-    }
-
-    // It's a match, collect eventual dynamic args
-    const args = match.slice(1);
-
-    // Cut the matched part
-    raw = raw.slice(match[0].length).trimLeft();
-
-    // If there are children 'routes'
-    if (Array.isArray(executor.children)) {
-        // Recurse through each one
-        for (let child of executor.children) {
-            const res = walkChildren(msg, raw, child);
-
-            // If the walking revealed a match, stop there
-            if (res !== false) {
-                // Append already matched arguments
-                res.args = [...args, res.args];
-                return res;
-            }
-        }
-    }
-
-    // No child routes or no match in the child routes
-    // Fallback on the local executor
-    if (executor.executor) {
-        return { executor, args };
-    } else {
-        return false;
-    }
-};
-
 module.exports = {
     register,
-    group,
     parse
 };

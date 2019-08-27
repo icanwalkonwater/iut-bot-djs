@@ -5,10 +5,11 @@
 // ###############################
 
 const commands = [
-    require('./TestCommand'),
-    require('./GroupCommand'),
+    require('./AdminCommand'),
     require('./StopCommand'),
-    require('./AdminCommand')
+    require('./SettingsCommand'),
+    require('./GroupCommand'),
+    require('./TestCommand')
 ];
 
 // Normalize patterns

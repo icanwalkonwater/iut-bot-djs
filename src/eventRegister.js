@@ -8,6 +8,7 @@ const {
 const { createErrorMessage } = require('./messageUtils');
 const commandProcessor = require('./commands/commandProcessor');
 const commandRegistry = require('./commands/commandRegistry');
+const welcomeForm = require('./forms/welcomeForm');
 
 // ***** Side effect *****
 // Register commands
@@ -35,7 +36,18 @@ module.exports = client => {
                 signale.info(
                     `Command (${msg.author.tag} ${msg.author.id}): ${msg.content}`
                 );
-                executor(msg, ...args, options);
+
+                const res = executor(msg, ...args, options);
+                if (res instanceof Promise) {
+                    res.catch(e => {
+                        signale.error(e);
+                        msg.channel.send(
+                            createErrorMessage(
+                                "Something's fucky, please contact an admin"
+                            )
+                        );
+                    });
+                }
             } catch (e) {
                 if (e instanceof CommandNotFoundError) {
                     // Silently ignore
@@ -55,7 +67,13 @@ module.exports = client => {
         }
     });
 
-    client.on('guildMemberAdd', member => {
+    client.on('guildMemberAdd', async member => {
         if (member.guild.id !== process.env.GUILD_ID) return;
+
+        // Trigger welcome form
+        await welcomeForm(
+            member.user,
+            member.dmChannel || (await member.createDM())
+        );
     });
 };

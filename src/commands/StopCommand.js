@@ -1,8 +1,8 @@
 /** @format */
 
 const { Command } = require('./Command');
-const { createInfoMessage, createErrorMessage } = require('../messageUtils');
-const { permissionError } = require('./errors');
+const { createInfoMessage } = require('../messageUtils');
+const { ownerGuard } = require('./commandUtils');
 
 class StopCommand extends Command {
     constructor() {
@@ -14,8 +14,7 @@ class StopCommand extends Command {
     }
 
     execute(msg) {
-        if (msg.author.id !== process.env.OWNER_ID) {
-            msg.channel.send(createErrorMessage(permissionError));
+        if (!ownerGuard(msg)) {
             return;
         }
 

@@ -4,10 +4,23 @@ const { RichEmbed } = require('discord.js');
 
 // Factories
 
+/**
+ * @param color {module:discord.js.ColorResolvable}
+ * @param icon {String}
+ * @param message {String}
+ * @return {module:discord.js.RichEmbed}
+ */
 const createSmallMessage = (color, icon, message) => {
     return new RichEmbed().setColor(color).setAuthor(message, icon);
 };
 
+/**
+ * @param color {module:discord.js.ColorResolvable}
+ * @param icon {String}
+ * @param title {String}
+ * @param message {String}
+ * @return {module:discord.js.RichEmbed}
+ */
 const createLongMessage = (color, icon, title, message) => {
     return new RichEmbed()
         .setColor(color)
@@ -17,10 +30,15 @@ const createLongMessage = (color, icon, title, message) => {
 
 const infoColor = 0x2196f3;
 const successColor = 0x4caf50;
+const warningColor = 0xff9800;
 const errorColor = 0xff0000;
 
 // Helpers
 
+/**
+ * @param message {String}
+ * @return {module:discord.js.RichEmbed}
+ */
 const createInfoMessage = message => {
     return createSmallMessage(
         infoColor,
@@ -29,6 +47,11 @@ const createInfoMessage = message => {
     );
 };
 
+/**
+ * @param title {String}
+ * @param message {String}
+ * @return {module:discord.js.RichEmbed}
+ */
 const createInfoMessageWithTitle = (title, message) => {
     return createLongMessage(
         infoColor,
@@ -38,6 +61,10 @@ const createInfoMessageWithTitle = (title, message) => {
     );
 };
 
+/**
+ * @param message {String}
+ * @return {module:discord.js.RichEmbed}
+ */
 const createSuccessMessage = message => {
     return createSmallMessage(
         successColor,
@@ -46,6 +73,11 @@ const createSuccessMessage = message => {
     );
 };
 
+/**
+ * @param title {String}
+ * @param message {String}
+ * @return {module:discord.js.RichEmbed}
+ */
 const createSuccessMessageWithTitle = (title, message) => {
     return createLongMessage(
         successColor,
@@ -55,6 +87,22 @@ const createSuccessMessageWithTitle = (title, message) => {
     );
 };
 
+/**
+ * @param message {String}
+ * @return {module:discord.js.RichEmbed}
+ */
+const createWarningMessage = message => {
+    return createSmallMessage(
+        warningColor,
+        'https://cdn.discordapp.com/attachments/302785106802638848/303136843153539082/sign-error-icon.png',
+        message
+    );
+};
+
+/**
+ * @param error {String|Error}
+ * @return {module:discord.js.RichEmbed}
+ */
 const createErrorMessage = error => {
     return createSmallMessage(
         errorColor,
@@ -63,6 +111,11 @@ const createErrorMessage = error => {
     );
 };
 
+/**
+ * @param title {String}
+ * @param error {String|Error}
+ * @return {module:discord.js.RichEmbed}
+ */
 const createDetailedErrorMessage = (title, error) => {
     return createLongMessage(
         errorColor,
@@ -71,6 +124,11 @@ const createDetailedErrorMessage = (title, error) => {
         error.message || error
     );
 };
+
+// Some emotes
+
+const whiteCheckMark = '\u2705';
+const noEntrySign = '\uD83D\uDEAB';
 
 module.exports = {
     createSmallMessage,
@@ -82,6 +140,11 @@ module.exports = {
     createSuccessMessage,
     createSuccessMessageWithTitle,
 
+    createWarningMessage,
+
     createErrorMessage,
-    createDetailedErrorMessage
+    createDetailedErrorMessage,
+
+    whiteCheckMark,
+    noEntrySign
 };

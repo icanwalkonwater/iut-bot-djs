@@ -1,8 +1,8 @@
 /** @format */
 
-const { createInfoMessage } = require('./messageUtils');
+const { createInfoMessage } = require('../messageUtils');
 
-const groups = process.env.GROUPS.split(',');
+const groups = process.env.GROUPS.split(',').map(g => g.toUpperCase());
 const groupsMap = new Map();
 
 groups.forEach(id => {
@@ -14,13 +14,15 @@ const joinHook = async (member, groupId) => {
     const client = member.client;
     const { channelId, roleId } = groupsMap.get(groupId);
 
-    const channel = client.channels?.[channelId];
+    const channel = client.channels.get(channelId);
 
     // Apply to discord
-    await Promise.all([
+    return await Promise.all([
         member.addRole(roleId),
-        channel?.send(
-            createInfoMessage(`${member.displayName} just joined this group !`)
+        channel.send(
+            createInfoMessage(
+                `${member.displayName} viens de rejoindre ce groupe !`
+            )
         )
     ]);
 };
@@ -29,6 +31,7 @@ const getGroupIds = () => {
     return groups;
 };
 
+// Reverse map (with cache)
 let groupIds = undefined;
 const getGroupRoleIds = () => {
     if (groupIds === undefined) {
@@ -40,13 +43,14 @@ const getGroupRoleIds = () => {
 
 const joinGroup = async (user, groupId) => {
     // Sanitize
+    groupId = groupId.toUpperCase();
     if (!groups.includes(groupId)) {
         return false;
     }
 
-    const member = await user.client.guilds[process.env.GUILD_ID].fetchMember(
-        user
-    );
+    const member = await user.client.guilds
+        .get(process.env.GUILD_ID)
+        .fetchMember(user);
 
     // Check if user already have a group role, in that case, abort
     if (member.roles.some((role, id) => getGroupIds().includes(id))) {
@@ -54,7 +58,7 @@ const joinGroup = async (user, groupId) => {
     }
 
     // Trigger discord-side logic
-    await joinHook(member, groupId);
+    return await joinHook(member, groupId);
 };
 
 module.exports = {

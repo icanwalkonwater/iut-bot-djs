@@ -2,49 +2,62 @@
 
 const { inspect } = require('util');
 const { Command } = require('./Command');
-const { group } = require('./commandProcessor');
+const { group, userMentionToIdPattern, ownerGuard } = require('./commandUtils');
 const {
     createErrorMessage,
     createDetailedErrorMessage,
-    createInfoMessage,
     createInfoMessageWithTitle,
+    createSuccessMessage,
     createSuccessMessageWithTitle
 } = require('../messageUtils');
-const { permissionError } = require('./errors');
 const { redisClient } = require('../config/storage');
+const welcomeForm = require('../forms/welcomeForm');
 
 class AdminCommand extends Command {
     constructor() {
         super(['admin', 'sudo'], 'Admin command');
 
+        // Resend welcome form
+        this.addExecutorMapping(
+            group(/resend-welcome/, userMentionToIdPattern),
+            ownerGuard,
+            this.executorResendWelcomeForm
+        );
+        this.addExecutorMapping(/resend-welcome/i, ownerGuard, (msg, opts) =>
+            this.executorResendWelcomeForm(msg, msg.author.id, opts)
+        );
+
         // Arbitrary redis command (with args)
         this.addExecutorMapping(
             group(/redis/, /([a-z]+)/, /(.+)/),
+            ownerGuard,
             this.executorRedis
         );
 
         // Arbitrary redis command (no args)
-        this.addExecutorMapping(group(/redis/, /([a-z]+)/), (msg, method) =>
-            this.executorRedis(msg, method)
+        this.addExecutorMapping(
+            group(/redis/, /([a-z]+)/),
+            ownerGuard,
+            (msg, method) => this.executorRedis(msg, method)
         );
 
         // Arbitrary JS eval with context
-        this.addExecutorMapping(group(/eval/, /(.+)/), this.executorEvalJs);
+        this.addExecutorMapping(
+            group(/eval/, /(.+)/),
+            ownerGuard,
+            this.executorEvalJs
+        );
     }
 
-    guard(msg) {
-        if (msg.author.id === process.env.OWNER_ID) {
-            return true;
-        } else {
-            msg.channel.send(createErrorMessage(permissionError));
-            return false;
-        }
+    async executorResendWelcomeForm(msg, userId) {
+        const user = await msg.client.fetchUser(userId);
+        const dmChannel = user.dmChannel || (await user.createDM());
+
+        await msg.channel.send(createSuccessMessage('Form triggered'));
+        await welcomeForm(dmChannel.recipient, dmChannel);
     }
 
     executorRedis(msg, method, args) {
-        // Only the owner can use this for obvious reason
-        if (!this.guard(msg)) return;
-
         // Sanitize a bit
         method = method.toUpperCase();
         if (args) args = args.split(/\s+/);
@@ -92,9 +105,6 @@ class AdminCommand extends Command {
     }
 
     executorEvalJs(msg, string, options) {
-        // Only the owner can use this for obvious reason
-        if (!this.guard(msg)) return;
-
         const fn = new Function('client', 'msg', string);
 
         let res;
