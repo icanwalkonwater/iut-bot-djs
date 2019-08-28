@@ -6,6 +6,7 @@
 
 const commands = [
     require('./HelpCommand'),
+    require('./AboutCommand'),
     require('./AdminCommand'),
     require('./StopCommand'),
     require('./SettingsCommand'),
