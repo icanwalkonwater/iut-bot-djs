@@ -12,7 +12,10 @@ class HelpCommand extends Command {
     }
 
     helpExecutor(msg) {
-        const res = createInfoMessageWithTitle('Aide')
+        const res = createInfoMessageWithTitle(
+            'Aide',
+            'List des commandes disponibles'
+        )
             .addField(
                 smallBlueDiamond + process.env.COMMAND_PREFIX + 'help',
                 'Affiche cette aide',
