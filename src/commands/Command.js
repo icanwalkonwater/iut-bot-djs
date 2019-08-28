@@ -36,7 +36,7 @@ class Command {
             };
         }
 
-        this.executorMap.push([regex, executor]);
+        this.executorMap.push([regex, executor.bind(this)]);
     }
 }
 

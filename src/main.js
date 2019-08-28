@@ -14,7 +14,7 @@ const client = new Discord.Client({
 // Setting up the shutdown hook
 require('./shutdownHook')(client);
 
-// Register everything
+// Register events
 require('./eventRegister')(client);
 
 // Ready hook

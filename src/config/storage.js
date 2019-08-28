@@ -57,22 +57,22 @@ const deleteUserSettings = /*async*/ id => {
 // *** Custom Groups ***
 
 const groupKey = id => {
-    return `group:${id}`;
+    return `groups:${id}`;
 };
 
 const groupSettingsKey = id => {
-    return `${groupKey(id)}:setting`;
+    return `${groupKey(id)}:settings`;
 };
 
 const groupMembersKey = id => {
     return `${groupKey(id)}:members`;
 };
 
-const groupLastIdKey = groupKey('last');
+const groupNextIdKey = groupKey('next');
 
 const fetchNextGroupId = /*async*/ () => {
     // Return the next id stored
-    return incr(groupLastIdKey).then(id => +id);
+    return incr(groupNextIdKey).then(id => +id);
 };
 
 const fetchGroup = /*async*/ id => {

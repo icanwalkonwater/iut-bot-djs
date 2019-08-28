@@ -77,10 +77,10 @@ const welcomeFormHandler = async (user, channel) => {
     } catch (e) {
         channel.send(
             createWarningMessage(
-                'Form failed. This can be due to inactivity or an error occured.'
+                'Form failed. This can be due to inactivity or an error occurred.'
             )
         );
-        signale.warn(`Form failed (${user.id} / #${channel.id})`);
+        signale.warn(`Welcome form failed (${user.id} / #${channel.id})`);
         signale.warn(e);
     }
 };

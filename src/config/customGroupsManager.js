@@ -10,9 +10,10 @@ const {
 } = require('./storage');
 
 const neededPermissions = [
-    'MANAGE_CHANNELS',
     'VIEW_CHANNEL',
     'SEND_MESSAGES',
+    'MANAGE_MESSAGES',
+    'MENTION_EVERYONE',
     'CONNECT'
 ];
 
@@ -22,7 +23,7 @@ const createGroup = async (client, name, ownerId, memberIds) => {
 
     // Create discord category
     const guild = client.guilds.get(process.env.GUILD_ID);
-    const { id: categoryId } = await createDiscordHook(
+    const { id: category } = await createDiscordHook(
         guild,
         id,
         name,
@@ -30,7 +31,7 @@ const createGroup = async (client, name, ownerId, memberIds) => {
     );
 
     // Commit new settings
-    await commitGroupSettings(id, { categoryId });
+    await commitGroupSettings(id, { category });
 
     // Return the id of the newly created group
     return id;
@@ -40,7 +41,7 @@ const eraseGroup = async (client, id) => {
     const { settings } = await fetchGroup(id);
     if (!settings) throw new Error("Group doesn't exists");
 
-    const { categoryId } = settings;
+    const { category: categoryId } = settings;
     const category = client.channels.get(categoryId);
 
     // Delete child channels
@@ -101,7 +102,7 @@ const transferOwnership = async (client, id, newOwnerId) => {
     const { settings, members } = await fetchGroup(id);
     if (!settings) throw new Error("Group doesn't exists");
 
-    settings.ownerId = newOwnerId;
+    settings.owner = newOwnerId;
 
     if (!members.includes(newOwnerId)) {
         await addMembers(client, id, newOwnerId);
@@ -111,10 +112,10 @@ const transferOwnership = async (client, id, newOwnerId) => {
 };
 
 const isGroupOwner = async (id, userId) => {
-    const { settings, members } = await fetchGroup(id);
+    const { settings } = await fetchGroup(id);
     if (!settings) throw new Error("Group doesn't exists");
 
-    return settings.ownerId === userId;
+    return settings.owner === userId;
 };
 
 const createDiscordHook = async (guild, id, name, memberIds) => {

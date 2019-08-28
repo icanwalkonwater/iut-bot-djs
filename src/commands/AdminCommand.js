@@ -104,12 +104,10 @@ class AdminCommand extends Command {
         }
     }
 
-    executorEvalJs(msg, string, options) {
-        const fn = new Function('client', 'msg', string);
-
+    executorEvalJs(msg, code, options) {
         let res;
         try {
-            res = fn(msg.client, msg);
+            res = new Function('client', 'msg', code)(msg.client, msg);
         } catch (e) {
             res = e;
         }
@@ -140,7 +138,7 @@ class AdminCommand extends Command {
         msg.channel.send(
             createInfoMessageWithTitle(
                 'Eval',
-                `**Code**: \`\`\`js\n${string}\`\`\`
+                `**Code**: \`\`\`js\n${code}\`\`\`
                  **Result**: \`\`\`js\n${res}\`\`\``
             )
         );

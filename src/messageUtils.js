@@ -100,6 +100,20 @@ const createWarningMessage = message => {
 };
 
 /**
+ * @param title {String}
+ * @param message {String}
+ * @return {module:discord.js.RichEmbed}
+ */
+const createWarningMessageWithTitle = (title, message) => {
+    return createLongMessage(
+        warningColor,
+        'https://cdn.discordapp.com/attachments/302785106802638848/303136843153539082/sign-error-icon.png',
+        title,
+        message
+    );
+};
+
+/**
  * @param error {String|Error}
  * @return {module:discord.js.RichEmbed}
  */
@@ -130,6 +144,7 @@ const createDetailedErrorMessage = (title, error) => {
 const whiteCheckMark = '\u2705';
 const noEntrySign = '\uD83D\uDEAB';
 const smallBlueDiamond = '\uD83D\uDD39';
+const smallOrangeDiamond = '\uD83D\uDD38';
 
 module.exports = {
     createSmallMessage,
@@ -142,11 +157,13 @@ module.exports = {
     createSuccessMessageWithTitle,
 
     createWarningMessage,
+    createWarningMessageWithTitle,
 
     createErrorMessage,
     createDetailedErrorMessage,
 
     whiteCheckMark,
     noEntrySign,
-    smallBlueDiamond
+    smallBlueDiamond,
+    smallOrangeDiamond
 };

@@ -64,7 +64,7 @@ const parse = (msg, raw) => {
 
     let options = [...collector()];
     if (options.length) {
-        options.reduce((prev, next) => {
+        options = options.reduce((prev, next) => {
             return { ...prev, ...next };
         });
     }
