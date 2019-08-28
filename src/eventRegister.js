@@ -21,7 +21,7 @@ module.exports = client => {
     // Command listener
     client.on('message', msg => {
         // Ignore messages from other guilds
-        if (msg.guild.id !== process.env.GUILD_ID) return;
+        if (msg?.guild?.id !== process.env.GUILD_ID) return;
 
         // Ignore bot message, including self
         if (msg.author.bot) return;

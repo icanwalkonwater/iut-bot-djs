@@ -2,7 +2,13 @@
 
 const { inspect } = require('util');
 const { Command } = require('./Command');
-const { group, userMentionToIdPattern, ownerGuard } = require('./commandUtils');
+const {
+    group,
+    userMentionToIdPattern,
+    messageLinkPattern,
+    ownerGuard,
+    broadcastGuard
+} = require('./commandUtils');
 const {
     createErrorMessage,
     createDetailedErrorMessage,
@@ -10,12 +16,19 @@ const {
     createSuccessMessage,
     createSuccessMessageWithTitle
 } = require('../messageUtils');
-const { redisClient } = require('../config/storage');
+const { redisClient, fetchAllUserSettings } = require('../config/storage');
 const welcomeForm = require('../forms/welcomeForm');
 
 class AdminCommand extends Command {
     constructor() {
         super(['admin', 'sudo'], 'Admin command');
+
+        // Broadcast a message to every user that agreed to by MP
+        this.addExecutorMapping(
+            group(/broadcast/, messageLinkPattern),
+            broadcastGuard,
+            this.broadcast
+        );
 
         // Resend welcome form
         this.addExecutorMapping(
@@ -47,6 +60,52 @@ class AdminCommand extends Command {
             ownerGuard,
             this.executorEvalJs
         );
+    }
+
+    async broadcast(msg, channelId, messageId) {
+        const messagePromise = msg.client.channels
+            .get(channelId)
+            ?.fetchMessage(messageId);
+
+        if (!messagePromise) {
+            return msg.channel.send(
+                createErrorMessage('Ce channel ne semble pas exister')
+            );
+        }
+
+        try {
+            // Fetch the message and the user settings
+            const [message, allSettings] = await Promise.all([
+                messagePromise,
+                fetchAllUserSettings()
+            ]);
+
+            // Filter the targeted users
+            const sendTo = allSettings
+                .filter(settings => settings.allowPm === 'true')
+                .map(({ user }) => user);
+
+            // Broadcast the message
+            const sentMessages = await Promise.all(
+                sendTo.map(async id => {
+                    const realUser = await msg.client.fetchUser(id);
+                    const dmChannel =
+                        realUser.dmChannel || (await realUser.createDM());
+
+                    return dmChannel.send(message.content);
+                })
+            );
+
+            return msg.channel.send(
+                createSuccessMessage(
+                    `Broadcasted to ${sentMessages.length} users`
+                )
+            );
+        } catch (e) {
+            return msg.channel.send(
+                createErrorMessage("Ce message n'éxiste pas")
+            );
+        }
     }
 
     async executorResendWelcomeForm(msg, userId) {

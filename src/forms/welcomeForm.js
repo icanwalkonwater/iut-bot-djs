@@ -48,7 +48,7 @@ const welcomeForm = newForm(
             mapper: m => m.startsWith('o')
         }
     ],
-    ([name, group, allowMp]) => ({ name, group, allowMp })
+    ([name, group, allowPm]) => ({ name, group, allowPm })
 );
 
 const welcomeFormHandler = async (user, channel) => {

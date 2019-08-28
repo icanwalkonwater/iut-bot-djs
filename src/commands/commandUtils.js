@@ -21,6 +21,7 @@ const userMentionToIdPattern = /<@!?(\d+)>/i;
 const channelMentionToIdPattern = /<#(\d+)>/;
 const roleMentionToIdPattern = /<@&(\d+)>/;
 const booleanPattern = /(true|false|1|0|on|off)/i;
+const messageLinkPattern = /https:\/\/(?:canary\.)?discordapp\.com\/channels\/[0-9]+\/([0-9+]+)\/([0-9]+)/;
 
 // Guards
 
@@ -30,6 +31,18 @@ const reject = msg => {
 
 const ownerGuard = msg => {
     if (msg.author.id === process.env.OWNER_ID) {
+        return true;
+    } else {
+        reject(msg);
+        return false;
+    }
+};
+
+const broadcastAllowedIds = !!process.env.BROADCAST_ALLOWED_IDS
+    ? process.env.BROADCAST_ALLOWED_IDS.split(',')
+    : [];
+const broadcastGuard = msg => {
+    if (broadcastAllowedIds.includes(msg.author.id)) {
         return true;
     } else {
         reject(msg);
@@ -70,8 +83,10 @@ module.exports = {
     channelMentionToIdPattern,
     roleMentionToIdPattern,
     booleanPattern,
+    messageLinkPattern,
 
     ownerGuard,
+    broadcastGuard,
     makeRoleGuard,
     makePermissionGuard
 };

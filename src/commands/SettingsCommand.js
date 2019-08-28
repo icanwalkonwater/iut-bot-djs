@@ -28,11 +28,11 @@ class SettingsCommand extends Command {
             SettingsCommand.prototype.indexExecutor
         );
 
-        // Set allowMp setting
+        // Set allowPm setting
         this.addExecutorMapping(
-            group(/set/, /allowMp/, booleanPattern),
+            group(/set/, /allowPm/, booleanPattern),
             undefined,
-            this.setAllowMpExecutor
+            this.setAllowPmExecutor
         );
     }
 
@@ -47,13 +47,13 @@ class SettingsCommand extends Command {
         }
 
         // Destructure settings
-        const { allowMp } = settings;
+        const { allowPm } = settings;
 
         const res = createInfoMessage('Paramètres').addField(
             'Autoriser les MPs',
             settingDescriptionCreator(
-                'allowMp',
-                allowMp === 'true' ? whiteCheckMark : noEntrySign
+                'allowPm',
+                allowPm === 'true' ? whiteCheckMark : noEntrySign
             ),
             true
         );
@@ -62,7 +62,7 @@ class SettingsCommand extends Command {
         await msg.channel.send(res);
     }
 
-    async setAllowMpExecutor(msg, value) {
+    async setAllowPmExecutor(msg, value) {
         const settings = await fetchUserSettings(msg.author.id);
         if (!settings) {
             return msg.channel.send(
@@ -72,12 +72,12 @@ class SettingsCommand extends Command {
             );
         }
 
-        settings.allowMp = /true|1|on/i.test(value);
+        settings.allowPm = /true|1|on/i.test(value);
         await commitUserSettings(msg.author.id, settings);
 
         await msg.channel.send(
             createSuccessMessage(
-                settings.allowMp
+                settings.allowPm
                     ? 'Vous êtes maintenant susceptible de recevoir des MPs'
                     : 'Vous ne recevrez plus de MPs'
             )

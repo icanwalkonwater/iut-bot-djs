@@ -28,6 +28,7 @@ client.on('error', error => {
 const get = promisify(client.get).bind(client);
 const del = promisify(client.del).bind(client);
 const incr = promisify(client.incr).bind(client);
+const keys = promisify(client.keys).bind(client);
 // Hash sets
 const hgetall = promisify(client.hgetall).bind(client);
 const hmset = promisify(client.hmset).bind(client);
@@ -44,6 +45,16 @@ const userSettingsKey = id => {
 
 const fetchUserSettings = /*async*/ id => {
     return hgetall(userSettingsKey(id));
+};
+
+const fetchAllUserSettings = async () => {
+    const userKeys = await keys('users:*');
+    const settingsOnly = await Promise.all(userKeys.map(k => hgetall(k)));
+
+    return userKeys.map((userKey, index) => ({
+        user: userKey.slice(6),
+        ...settingsOnly[index]
+    }));
 };
 
 const commitUserSettings = (id, settings) => {
@@ -116,6 +127,7 @@ module.exports = {
     redisClient: client,
 
     fetchUserSettings,
+    fetchAllUserSettings,
     commitUserSettings,
     deleteUserSettings,
 
