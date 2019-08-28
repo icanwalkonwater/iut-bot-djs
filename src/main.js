@@ -1,7 +1,15 @@
 /** @format */
 
+// Init env right away
 require('dotenv').config();
+
+// Configure logging
 const signale = require('signale');
+signale.config({
+    displayTimestamp: true,
+    displayDate: true
+});
+
 const Discord = require('discord.js');
 
 // Create discord client
