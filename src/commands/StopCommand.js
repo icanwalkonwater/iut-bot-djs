@@ -7,7 +7,7 @@ const { ownerGuard } = require('./commandUtils');
 class StopCommand extends Command {
     constructor() {
         super(
-            ['stop', 'shutdown'],
+            ['stop', 'shutdown', 'reboot'],
             'Stop the bot',
             StopCommand.prototype.execute
         );

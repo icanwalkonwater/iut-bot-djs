@@ -29,6 +29,13 @@ require('./config/storage');
 const token = process.env.TOKEN || throw Error('No token provided !');
 
 signale.pending('Starting...');
-client.login(token).then(() => {
-    signale.complete('Started !');
-});
+client
+    .login(token)
+    .then(() => {
+        return client.user.setActivity(process.env.COMMAND_PREFIX + 'help', {
+            type: 'PLAYING'
+        });
+    })
+    .then(() => {
+        signale.complete('Started !');
+    });

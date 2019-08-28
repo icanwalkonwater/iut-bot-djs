@@ -354,7 +354,9 @@ class GroupCommand extends Command {
                 );
             } catch (e) {
                 // Failed to send probably because the channel is gone.
-                signale.warn(`Confirm erase ${id}: channel deleted`);
+                signale.warn(
+                    `Group ${id}: channel deleted, can't send confirm message`
+                );
             }
         } catch (e) {
             await msg.channel.send(

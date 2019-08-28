@@ -23,7 +23,7 @@ const settingDescriptionCreator = (key, value) => {
 class SettingsCommand extends Command {
     constructor() {
         super(
-            'settings',
+            ['settings', 'setting'],
             'Change personal settings',
             SettingsCommand.prototype.indexExecutor
         );
