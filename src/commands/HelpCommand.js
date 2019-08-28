@@ -16,6 +16,7 @@ class HelpCommand extends Command {
             'Aide',
             'List des commandes disponibles'
         )
+            .setColor(0xffffff)
             .addField(
                 smallBlueDiamond + process.env.COMMAND_PREFIX + 'help',
                 'Affiche cette aide',
@@ -28,7 +29,12 @@ class HelpCommand extends Command {
             )
             .addField(
                 smallBlueDiamond + process.env.COMMAND_PREFIX + 'group',
-                'Crée et gère tes groupes custom.',
+                'Crée et gère tes groupes custom',
+                true
+            )
+            .addField(
+                smallBlueDiamond + process.env.COMMAND_PREFIX + 'about',
+                'Affiche quelques informations utiles sur le bot',
                 true
             );
 
