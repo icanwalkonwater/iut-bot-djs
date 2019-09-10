@@ -57,7 +57,7 @@ const addMembers = async (client, id, memberIds) => {
     const { settings } = await fetchGroup(id);
     if (!settings) throw new Error("Group doesn't exists");
 
-    const { categoryId } = settings;
+    const { category: categoryId } = settings;
     const category = client.channels.get(categoryId);
 
     // Craft permissions
