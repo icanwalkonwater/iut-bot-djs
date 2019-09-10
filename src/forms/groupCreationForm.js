@@ -40,7 +40,7 @@ const groupCreationForm = newForm(
         }
     ],
     ([name, memberIds]) => ({ name, memberIds }),
-    6000 // 1min
+    300000 // 5min
 );
 
 const groupCreationFormHandler = async (user, channel) => {
