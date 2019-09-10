@@ -38,6 +38,8 @@ const ownerGuard = msg => {
     }
 };
 
+const adminRoleGuard = makeRoleGuard(process.env.ADMIN_ROLE_ID);
+
 const broadcastAllowedIds = !!process.env.BROADCAST_ALLOWED_IDS
     ? process.env.BROADCAST_ALLOWED_IDS.split(',')
     : [];
@@ -87,6 +89,7 @@ module.exports = {
 
     ownerGuard,
     broadcastGuard,
+    adminRoleGuard,
     makeRoleGuard,
     makePermissionGuard
 };

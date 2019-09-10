@@ -10,15 +10,17 @@ const {
  * @param title {String}
  * @param questions {{question: String, pattern: RegExp|String, error: String, mapper: Function}[]}
  * @param answersMapper {Function}
+ * @param timeout {Number}
  * @return {Function<Promise<Array<String>>>}
  */
-const newForm = (title, questions, answersMapper) => {
+const newForm = (title, questions, answersMapper, timeout = 6000) => {
     return async (user, channel) => {
         const answers = [];
 
         for (const index in questions) {
             const question = questions[index];
             const response = await askQuestion(
+                timeout,
                 channel,
                 user.id,
                 `${title} (${+index + 1}/${questions.length})`,
@@ -36,7 +38,7 @@ const newForm = (title, questions, answersMapper) => {
 };
 
 /**
- *
+ * @param timeout {Number}
  * @param channel {Discord.TextBasedChannel}
  * @param userId {String}
  * @param title {String}
@@ -46,6 +48,7 @@ const newForm = (title, questions, answersMapper) => {
  * @param mapper {Function}
  */
 const askQuestion = async (
+    timeout,
     channel,
     userId,
     title,
@@ -69,7 +72,7 @@ const askQuestion = async (
     // No catch, the form need to handle the timeout error
     let validResponse = await channel.awaitMessages(filter, {
         max: 1,
-        time: 60000,
+        time: timeout,
         errors: ['time']
     });
 

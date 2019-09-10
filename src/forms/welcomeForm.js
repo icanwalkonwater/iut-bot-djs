@@ -48,7 +48,8 @@ const welcomeForm = newForm(
             mapper: m => m.startsWith('o')
         }
     ],
-    ([name, group, allowPm]) => ({ name, group, allowPm })
+    ([name, group, allowPm]) => ({ name, group, allowPm }),
+    3600000 // 1h
 );
 
 const welcomeFormHandler = async (user, channel) => {

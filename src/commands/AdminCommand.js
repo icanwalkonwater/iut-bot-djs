@@ -7,6 +7,7 @@ const {
     userMentionToIdPattern,
     messageLinkPattern,
     ownerGuard,
+    adminRoleGuard,
     broadcastGuard
 } = require('./commandUtils');
 const {
@@ -33,11 +34,8 @@ class AdminCommand extends Command {
         // Resend welcome form
         this.addExecutorMapping(
             group(/resend-welcome/, userMentionToIdPattern),
-            ownerGuard,
+            adminRoleGuard,
             this.executorResendWelcomeForm
-        );
-        this.addExecutorMapping(/resend-welcome/i, ownerGuard, (msg, opts) =>
-            this.executorResendWelcomeForm(msg, msg.author.id, opts)
         );
 
         // Arbitrary redis command (with args)
