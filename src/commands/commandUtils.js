@@ -29,29 +29,7 @@ const reject = msg => {
     msg.channel.send(createErrorMessage(permissionError));
 };
 
-const ownerGuard = msg => {
-    if (msg.author.id === process.env.OWNER_ID) {
-        return true;
-    } else {
-        reject(msg);
-        return false;
-    }
-};
-
-const adminRoleGuard = makeRoleGuard(process.env.ADMIN_ROLE_ID);
-
-const broadcastAllowedIds = !!process.env.BROADCAST_ALLOWED_IDS
-    ? process.env.BROADCAST_ALLOWED_IDS.split(',')
-    : [];
-const broadcastGuard = msg => {
-    if (broadcastAllowedIds.includes(msg.author.id)) {
-        return true;
-    } else {
-        reject(msg);
-        return false;
-    }
-};
-
+// Guard factories
 const makeRoleGuard = roleId => {
     return msg => {
         // Must be in guild
@@ -76,6 +54,29 @@ const makePermissionGuard = rawPerm => {
             return false;
         }
     };
+};
+
+const ownerGuard = msg => {
+    if (msg.author.id === process.env.OWNER_ID) {
+        return true;
+    } else {
+        reject(msg);
+        return false;
+    }
+};
+
+const adminRoleGuard = makeRoleGuard(process.env.ADMIN_ROLE_ID);
+
+const broadcastAllowedIds = !!process.env.BROADCAST_ALLOWED_IDS
+    ? process.env.BROADCAST_ALLOWED_IDS.split(',')
+    : [];
+const broadcastGuard = msg => {
+    if (broadcastAllowedIds.includes(msg.author.id)) {
+        return true;
+    } else {
+        reject(msg);
+        return false;
+    }
 };
 
 module.exports = {
