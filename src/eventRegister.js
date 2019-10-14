@@ -26,15 +26,17 @@ module.exports = client => {
         // Ignore bot message, including self
         if (msg.author.bot) return;
 
-        // Barre verticale stp
-        if (/barre verticale stp.*/i.test(msg.content)) {
-            msg.channel.send(`<@${msg.author.id}>, |`);
-        }
-
         // If is a command-like message
         if (msg.content.startsWith(process.env.COMMAND_PREFIX)) {
             const raw = msg.content.slice(process.env.COMMAND_PREFIX.length);
             return commandHandler(msg, raw);
+        }
+    });
+
+    // Fun
+    client.on('message', msg => {
+        if (/barre verticale stp.*/i.test(msg.content)) {
+            msg.channel.send(`<@${msg.author.id}>, |`);
         }
     });
 
