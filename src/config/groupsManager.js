@@ -7,10 +7,12 @@ const { createInfoMessage } = require('../messageUtils');
 const groups = process.env.GROUPS.split(',').map(g => g.toUpperCase());
 const groupsMap = new Map();
 
-groups.forEach(id => {
-    const [channelId, roleId] = process.env[`GROUPS_${id}`].split(',');
-    groupsMap.set(id, { channelId, roleId });
-});
+if (process.env.GROUPS) {
+    groups.forEach(id => {
+        const [channelId, roleId] = process.env[`GROUPS_${id}`].split(',');
+        groupsMap.set(id, { channelId, roleId });
+    });
+}
 
 // Functions
 
