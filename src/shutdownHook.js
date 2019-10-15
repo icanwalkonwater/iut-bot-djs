@@ -1,10 +1,10 @@
 /** @format */
 
-const { promisify } = require('util');
-const signale = require('signale');
-const { redisClient } = require('./config/storage');
+import { promisify } from 'util';
+import signale from 'signale';
+import { redisClient } from './config/storage';
 
-module.exports = client => {
+export default client => {
     const shutdownHook = async () => {
         await client.destroy();
         await promisify(redisClient.quit).bind(redisClient)();

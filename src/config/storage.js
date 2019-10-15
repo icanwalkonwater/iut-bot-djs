@@ -1,41 +1,41 @@
 /** @format */
 
-const { promisify } = require('util');
-const signale = require('signale');
-const redis = require('redis');
+import { promisify } from 'util';
+import signale from 'signale';
+import * as redis from 'redis';
 
 // Redis setup
-const client = redis.createClient({
+export const redisClient = redis.createClient({
     port: +process.env.REDIS_PORT,
     password: process.env.REDIS_PASSWORD,
     db: +process.env.REDIS_DATABASE
 });
 
-client.once('ready', () => {
+redisClient.once('ready', () => {
     signale.success('Redis ready !');
 });
 
-client.on('reconnecting', (delay, attempt) => {
+redisClient.on('reconnecting', (delay, attempt) => {
     signale.warn(`Reconnecting to redis... (Attempt ${attempt})`);
 });
 
-client.on('error', error => {
+redisClient.on('error', error => {
     signale.error('Uncaught redis error');
     signale.error(error);
 });
 
 // Promisify the used methods
-const get = promisify(client.get).bind(client);
-const del = promisify(client.del).bind(client);
-const incr = promisify(client.incr).bind(client);
-const keys = promisify(client.keys).bind(client);
+const get = promisify(redisClient.get).bind(redisClient);
+const del = promisify(redisClient.del).bind(redisClient);
+const incr = promisify(redisClient.incr).bind(redisClient);
+const keys = promisify(redisClient.keys).bind(redisClient);
 // Hash sets
-const hgetall = promisify(client.hgetall).bind(client);
-const hmset = promisify(client.hmset).bind(client);
+const hgetall = promisify(redisClient.hgetall).bind(redisClient);
+const hmset = promisify(redisClient.hmset).bind(redisClient);
 // Sets
-const sadd = promisify(client.sadd).bind(client);
-const smembers = promisify(client.smembers).bind(client);
-const srem = promisify(client.srem).bind(client);
+const sadd = promisify(redisClient.sadd).bind(redisClient);
+const smembers = promisify(redisClient.smembers).bind(redisClient);
+const srem = promisify(redisClient.srem).bind(redisClient);
 
 // *** User settings ***
 
@@ -43,11 +43,11 @@ const userSettingsKey = id => {
     return `users:${id}`;
 };
 
-const fetchUserSettings = /*async*/ id => {
+export const fetchUserSettings = /*async*/ id => {
     return hgetall(userSettingsKey(id));
 };
 
-const fetchAllUserSettings = async () => {
+export const fetchAllUserSettings = async () => {
     const userKeys = await keys('users:*');
     const settingsOnly = await Promise.all(userKeys.map(k => hgetall(k)));
 
@@ -57,11 +57,11 @@ const fetchAllUserSettings = async () => {
     }));
 };
 
-const commitUserSettings = (id, settings) => {
-    client.hmset(userSettingsKey(id), settings);
+export const commitUserSettings = (id, settings) => {
+    redisClient.hmset(userSettingsKey(id), settings);
 };
 
-const deleteUserSettings = /*async*/ id => {
+export const deleteUserSettings = /*async*/ id => {
     return del(userSettingsKey(id));
 };
 
@@ -86,7 +86,7 @@ const fetchNextGroupId = /*async*/ () => {
     return incr(groupNextIdKey).then(id => +id);
 };
 
-const fetchGroup = /*async*/ id => {
+export const fetchGroup = /*async*/ id => {
     return Promise.all([
         hgetall(groupSettingsKey(id)),
         smembers(groupMembersKey(id))
@@ -95,7 +95,7 @@ const fetchGroup = /*async*/ id => {
     });
 };
 
-const commitNewGroup = async (settings, members) => {
+export const commitNewGroup = async (settings, members) => {
     // No validation, beware
     const id = await fetchNextGroupId();
 
@@ -107,34 +107,18 @@ const commitNewGroup = async (settings, members) => {
     return id;
 };
 
-const commitGroupSettings = /*async*/ (id, settings) => {
+export const commitGroupSettings = /*async*/ (id, settings) => {
     return hmset(groupSettingsKey(id), settings);
 };
 
-const addGroupMembers = /*async*/ (id, members) => {
+export const addGroupMembers = /*async*/ (id, members) => {
     return sadd(groupMembersKey(id), members);
 };
 
-const removeGroupMembers = /*async*/ (id, members) => {
+export const removeGroupMembers = /*async*/ (id, members) => {
     return srem(groupMembersKey(id), members);
 };
 
-const deleteGroup = /*async*/ id => {
+export const deleteGroup = /*async*/ id => {
     return Promise.all([del(groupSettingsKey(id)), del(groupMembersKey(id))]);
-};
-
-module.exports = {
-    redisClient: client,
-
-    fetchUserSettings,
-    fetchAllUserSettings,
-    commitUserSettings,
-    deleteUserSettings,
-
-    fetchGroup,
-    commitNewGroup,
-    commitGroupSettings,
-    addGroupMembers,
-    removeGroupMembers,
-    deleteGroup
 };

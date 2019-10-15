@@ -1,6 +1,6 @@
 /** @format */
 
-const { createInfoMessage } = require('../messageUtils');
+import { createInfoMessage } from '../messageUtils';
 
 // Setup groups
 
@@ -16,7 +16,7 @@ if (process.env.GROUPS) {
 
 // Functions
 
-const getGroupIds = () => {
+export const getGroupIds = () => {
     return groups;
 };
 
@@ -30,7 +30,8 @@ const getGroupRoleIds = () => {
 
     return groupIds;
 };
-const joinGroup = async (user, groupId) => {
+
+export const joinGroup = async (user, groupId) => {
     // Sanitize
     groupId = groupId.toUpperCase();
     if (!groups.includes(groupId)) {
@@ -65,9 +66,4 @@ const joinDiscordHook = async (member, groupId) => {
             )
         )
     ]);
-};
-
-module.exports = {
-    getGroupIds,
-    joinGroup
 };

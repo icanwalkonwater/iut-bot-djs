@@ -1,24 +1,24 @@
 /** @format */
 
-const { inspect } = require('util');
-const { Command } = require('./Command');
-const {
+import { inspect } from 'util';
+import { Command } from './Command';
+import {
+    adminRoleGuard,
+    broadcastGuard,
     group,
-    userMentionToIdPattern,
     messageLinkPattern,
     ownerGuard,
-    adminRoleGuard,
-    broadcastGuard
-} = require('./commandUtils');
-const {
-    createErrorMessage,
+    userMentionToIdPattern
+} from './commandUtils';
+import {
     createDetailedErrorMessage,
+    createErrorMessage,
     createInfoMessageWithTitle,
     createSuccessMessage,
     createSuccessMessageWithTitle
-} = require('../messageUtils');
-const { redisClient, fetchAllUserSettings } = require('../config/storage');
-const welcomeForm = require('../forms/welcomeForm');
+} from '../messageUtils';
+import { fetchAllUserSettings, redisClient } from '../config/storage';
+import welcomeForm from '../forms/welcomeForm';
 
 class AdminCommand extends Command {
     constructor() {
@@ -202,4 +202,4 @@ class AdminCommand extends Command {
     }
 }
 
-module.exports = new AdminCommand();
+export default new AdminCommand();

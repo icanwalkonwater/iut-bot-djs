@@ -1,8 +1,8 @@
 /** @format */
 
-const { Command } = require('./Command');
-const { createInfoMessage } = require('../messageUtils');
-const { ownerGuard } = require('./commandUtils');
+import { Command } from './Command';
+import { createInfoMessage } from '../messageUtils';
+import { ownerGuard } from './commandUtils';
 
 class StopCommand extends Command {
     constructor() {
@@ -25,4 +25,4 @@ class StopCommand extends Command {
     }
 }
 
-module.exports = new StopCommand();
+export default new StopCommand();

@@ -1,7 +1,7 @@
 /** @format */
 
-const { RichEmbed, version } = require('discord.js');
-const { Command } = require('./Command');
+import { RichEmbed, version } from 'discord.js';
+import { Command } from './Command';
 
 const start = Date.now() / 1000;
 
@@ -51,4 +51,4 @@ class AboutCommand extends Command {
     }
 }
 
-module.exports = new AboutCommand();
+export default new AboutCommand();

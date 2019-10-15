@@ -1,16 +1,18 @@
 /** @format */
 
+import signale from 'signale';
+import * as Discord from 'discord.js';
+import shutdownHook from './shutdownHook';
+import eventRegister from './eventRegister';
+
 // Init env right away
 require('dotenv').config();
 
 // Configure logging
-const signale = require('signale');
 signale.config({
     displayTimestamp: true,
     displayDate: true
 });
-
-const Discord = require('discord.js');
 
 // Create discord client
 const client = new Discord.Client({
@@ -20,10 +22,10 @@ const client = new Discord.Client({
 });
 
 // Setting up the shutdown hook
-require('./shutdownHook')(client);
+shutdownHook(client);
 
 // Register events
-require('./eventRegister')(client);
+eventRegister(client);
 
 // Ready hook
 client.once('ready', () => {

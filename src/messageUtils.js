@@ -1,6 +1,6 @@
 /** @format */
 
-const { RichEmbed } = require('discord.js');
+import { RichEmbed } from 'discord.js';
 
 // Factories
 

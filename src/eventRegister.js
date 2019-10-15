@@ -1,15 +1,12 @@
 /** @format */
 
-const signale = require('signale');
-const {
-    RouteMismatchError,
-    CommandNotFoundError
-} = require('./commands/errors');
-const { createErrorMessage } = require('./messageUtils');
-const commandProcessor = require('./commands/commandProcessor');
-const commandRegistry = require('./commands/commandRegistry');
-const { fetchUserSettings } = require('./config/storage');
-const welcomeForm = require('./forms/welcomeForm');
+import signale from 'signale';
+import { CommandNotFoundError, RouteMismatchError } from './commands/errors';
+import { createErrorMessage } from './messageUtils';
+import commandProcessor from './commands/commandProcessor';
+import commandRegistry from './commands/commandRegistry';
+import { fetchUserSettings } from './config/storage';
+import welcomeForm from './forms/welcomeForm';
 
 // ***** Side effect *****
 // Register commands
@@ -17,7 +14,7 @@ for (let command of commandRegistry) {
     commandProcessor.register(command);
 }
 
-module.exports = client => {
+export default client => {
     // Command listener
     client.on('message', msg => {
         // Ignore messages from other guilds

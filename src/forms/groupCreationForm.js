@@ -1,9 +1,9 @@
 /** @format */
 
-const signale = require('signale');
-const { createWarningMessage } = require('../messageUtils');
-const { newForm } = require('./form');
-const { createGroup } = require('../config/customGroupsManager');
+import signale from 'signale';
+import { createWarningMessage } from '../messageUtils';
+import { newForm } from './form';
+import { createGroup } from '../config/customGroupsManager';
 
 const groupCreationForm = newForm(
     'Création de groupe',
@@ -66,4 +66,4 @@ const groupCreationFormHandler = async (user, channel) => {
     }
 };
 
-module.exports = groupCreationFormHandler;
+export default groupCreationFormHandler;

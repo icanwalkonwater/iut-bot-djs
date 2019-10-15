@@ -1,10 +1,7 @@
 /** @format */
 
-const { Command } = require('./Command');
-const {
-    createInfoMessageWithTitle,
-    smallBlueDiamond
-} = require('../messageUtils');
+import { Command } from './Command';
+import { createInfoMessageWithTitle, smallBlueDiamond } from '../messageUtils';
 
 class HelpCommand extends Command {
     constructor() {
@@ -42,4 +39,4 @@ class HelpCommand extends Command {
     }
 }
 
-module.exports = new HelpCommand();
+export default new HelpCommand();

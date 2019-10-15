@@ -1,19 +1,15 @@
 /** @format */
 
-class CommandNotFoundError extends Error {
+export class CommandNotFoundError extends Error {
     constructor() {
         super('Command not found');
     }
 }
 
-class RouteMismatchError extends Error {
+export class RouteMismatchError extends Error {
     constructor(msg) {
         super('SyntaxError: ' + msg);
     }
 }
 
-module.exports = {
-    CommandNotFoundError,
-    RouteMismatchError,
-    permissionError: new Error('Unsuffisent permissions')
-};
+export const permissionError = new Error('Unsiffisent permissions');

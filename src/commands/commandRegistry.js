@@ -24,4 +24,4 @@ commands.forEach(command => {
     }
 });
 
-module.exports = commands;
+export default commands;

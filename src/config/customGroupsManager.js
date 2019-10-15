@@ -1,13 +1,13 @@
 /** @format */
 
-const {
-    commitNewGroup,
-    fetchGroup,
-    deleteGroup,
-    commitGroupSettings,
+import {
     addGroupMembers,
+    commitGroupSettings,
+    commitNewGroup,
+    deleteGroup,
+    fetchGroup,
     removeGroupMembers
-} = require('./storage');
+} from './storage';
 
 const neededPermissions = [
     'VIEW_CHANNEL',
@@ -17,7 +17,7 @@ const neededPermissions = [
     'CONNECT'
 ];
 
-const createGroup = async (client, name, ownerId, memberIds) => {
+export const createGroup = async (client, name, ownerId, memberIds) => {
     // Create group entry to generate id
     const id = await commitNewGroup({ name: name, owner: ownerId }, memberIds);
 
@@ -37,7 +37,7 @@ const createGroup = async (client, name, ownerId, memberIds) => {
     return id;
 };
 
-const eraseGroup = async (client, id) => {
+export const eraseGroup = async (client, id) => {
     const { settings } = await fetchGroup(id);
     if (!settings) throw new Error("Group doesn't exists");
 
@@ -53,7 +53,7 @@ const eraseGroup = async (client, id) => {
     await deleteGroup(id);
 };
 
-const addMembers = async (client, id, memberIds) => {
+export const addMembers = async (client, id, memberIds) => {
     const { settings } = await fetchGroup(id);
     if (!settings) throw new Error("Group doesn't exists");
 
@@ -79,7 +79,7 @@ const addMembers = async (client, id, memberIds) => {
 };
 
 // Almost a copy-paste from the addMembers()
-const removeMembers = async (client, id, memberIds) => {
+export const removeMembers = async (client, id, memberIds) => {
     const { settings } = await fetchGroup(id);
     if (!settings) throw new Error("Group doesn't exists");
 
@@ -98,7 +98,7 @@ const removeMembers = async (client, id, memberIds) => {
     await removeGroupMembers(id, memberIds);
 };
 
-const transferOwnership = async (client, id, newOwnerId) => {
+export const transferOwnership = async (client, id, newOwnerId) => {
     const { settings, members } = await fetchGroup(id);
     if (!settings) throw new Error("Group doesn't exists");
 
@@ -111,7 +111,7 @@ const transferOwnership = async (client, id, newOwnerId) => {
     await commitGroupSettings(id, settings);
 };
 
-const isGroupOwner = async (id, userId) => {
+export const isGroupOwner = async (id, userId) => {
     const { settings } = await fetchGroup(id);
     if (!settings) throw new Error("Group doesn't exists");
 
@@ -141,13 +141,4 @@ const createDiscordHook = async (guild, id, name, memberIds) => {
     await guild.createChannel('Vocal', { type: 'voice', parent: category });
 
     return category;
-};
-
-module.exports = {
-    createGroup,
-    eraseGroup,
-    addMembers,
-    removeMembers,
-    transferOwnership,
-    isGroupOwner
 };

@@ -2,7 +2,8 @@
 
 const plugins = [
     '@babel/plugin-proposal-optional-chaining',
-    '@babel/plugin-proposal-throw-expressions'
+    '@babel/plugin-proposal-throw-expressions',
+    '@babel/plugin-transform-modules-commonjs'
 ];
 
 const presets = [

@@ -1,13 +1,10 @@
 /** @format */
 
-const signale = require('signale');
-const { getGroupIds, joinGroup } = require('../config/groupsManager');
-const { commitUserSettings } = require('../config/storage');
-const {
-    createSuccessMessage,
-    createWarningMessage
-} = require('../messageUtils');
-const { newForm } = require('./form');
+import signale from 'signale';
+import { getGroupIds, joinGroup } from '../config/groupsManager';
+import { commitUserSettings } from '../config/storage';
+import { createSuccessMessage, createWarningMessage } from '../messageUtils';
+import { newForm } from './form';
 
 const welcomeForm = newForm(
     'Formulaire de bienvenue',
@@ -86,4 +83,4 @@ const welcomeFormHandler = async (user, channel) => {
     }
 };
 
-module.exports = welcomeFormHandler;
+export default welcomeFormHandler;

@@ -1,16 +1,15 @@
 /** @format */
 
-const { RedisError } = require('redis');
-const { Command } = require('./Command');
-const { group, booleanPattern } = require('./commandUtils');
-const {
+import { Command } from './Command';
+import { booleanPattern, group } from './commandUtils';
+import {
+    createErrorMessage,
     createInfoMessage,
     createSuccessMessage,
-    createErrorMessage,
-    whiteCheckMark,
-    noEntrySign
-} = require('../messageUtils');
-const { fetchUserSettings, commitUserSettings } = require('../config/storage');
+    noEntrySign,
+    whiteCheckMark
+} from '../messageUtils';
+import { commitUserSettings, fetchUserSettings } from '../config/storage';
 
 const settingDescriptionCreator = (key, value) => {
     return `
@@ -85,4 +84,4 @@ class SettingsCommand extends Command {
     }
 }
 
-module.exports = new SettingsCommand();
+export default new SettingsCommand();

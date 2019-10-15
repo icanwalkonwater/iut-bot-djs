@@ -1,30 +1,30 @@
 /** @format */
 
-const signale = require('signale');
-const { Command } = require('./Command');
-const {
+import signale from 'signale';
+import { Command } from './Command';
+import {
+    createErrorMessage,
     createInfoMessage,
     createInfoMessageWithTitle,
     createSuccessMessage,
     createWarningMessageWithTitle,
-    createErrorMessage,
     smallBlueDiamond,
     smallOrangeDiamond
-} = require('../messageUtils');
-const {
+} from '../messageUtils';
+import {
+    channelMentionToIdPattern,
     group,
-    userMentionToIdPattern,
-    channelMentionToIdPattern
-} = require('./commandUtils');
-const groupCreationForm = require('../forms/groupCreationForm');
-const {
+    userMentionToIdPattern
+} from './commandUtils';
+import groupCreationForm from '../forms/groupCreationForm';
+import {
     addMembers,
-    removeMembers,
     eraseGroup,
-    transferOwnership,
-    isGroupOwner
-} = require('../config/customGroupsManager');
-const { fetchGroup } = require('../config/storage');
+    isGroupOwner,
+    removeMembers,
+    transferOwnership
+} from '../config/customGroupsManager';
+import { fetchGroup } from '../config/storage';
 
 class GroupCommand extends Command {
     constructor() {
@@ -405,4 +405,4 @@ class GroupCommand extends Command {
     }
 }
 
-module.exports = new GroupCommand();
+export default new GroupCommand();

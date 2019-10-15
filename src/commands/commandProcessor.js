@@ -1,7 +1,6 @@
 /** @format */
 
-const signale = require('signale');
-const { RouteMismatchError, CommandNotFoundError } = require('./errors');
+import { CommandNotFoundError, RouteMismatchError } from './errors';
 
 const commandMap = new Map();
 
@@ -10,7 +9,7 @@ const commandMap = new Map();
  *
  * @param command - The command to register
  */
-const register = command => {
+export const register = command => {
     // Register every aliases of the command
     if (Array.isArray(command.name)) {
         command.name.forEach(n => commandMap.set(n, command));
@@ -29,7 +28,7 @@ const register = command => {
  * @throws CommandNotFoundError When the command can't be found in the registry.
  * @throws RouteMismatchError If the message can't be associated with any route.
  */
-const parse = (msg, raw) => {
+export const parse = (msg, raw) => {
     // Split at the first whitespace
     const commandName = raw.split(/\s/, 1)[0].toLowerCase();
 
@@ -95,9 +94,4 @@ const parse = (msg, raw) => {
 
     // No matches
     throw new RouteMismatchError('No route found for these arguments !');
-};
-
-module.exports = {
-    register,
-    parse
 };

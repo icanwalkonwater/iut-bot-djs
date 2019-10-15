@@ -1,6 +1,6 @@
 /** @format */
 
-class Command {
+export class Command {
     constructor(name, description, rootExecutor) {
         this.name = name;
         this.description = description;
@@ -39,5 +39,3 @@ class Command {
         this.executorMap.push([regex, executor.bind(this)]);
     }
 }
-
-module.exports = { Command };

@@ -1,7 +1,7 @@
 /** @format */
 
-const { createErrorMessage } = require('../messageUtils');
-const { permissionError } = require('./errors');
+import { createErrorMessage } from '../messageUtils';
+import { permissionError } from './errors';
 
 /**
  * Utility method to group multiple regex separated by any number of whitespaces.
@@ -9,7 +9,7 @@ const { permissionError } = require('./errors');
  *
  * @param patterns {RegExp}
  */
-const group = (...patterns) => {
+export const group = (...patterns) => {
     const combined = patterns.map(p => p.source).join(groupSeparator);
     return new RegExp(combined, 'i');
 };
@@ -17,11 +17,11 @@ const groupSeparator = /\s+/.source;
 
 // Useful argument regex
 
-const userMentionToIdPattern = /<@!?(\d+)>/i;
-const channelMentionToIdPattern = /<#(\d+)>/;
-const roleMentionToIdPattern = /<@&(\d+)>/;
-const booleanPattern = /(true|false|1|0|on|off)/i;
-const messageLinkPattern = /https:\/\/(?:canary\.)?discordapp\.com\/channels\/[0-9]+\/([0-9+]+)\/([0-9]+)/;
+export const userMentionToIdPattern = /<@!?(\d+)>/i;
+export const channelMentionToIdPattern = /<#(\d+)>/;
+export const roleMentionToIdPattern = /<@&(\d+)>/;
+export const booleanPattern = /(true|false|1|0|on|off)/i;
+export const messageLinkPattern = /https:\/\/(?:canary\.)?discordapp\.com\/channels\/[0-9]+\/([0-9+]+)\/([0-9]+)/;
 
 // Guards
 
@@ -30,7 +30,7 @@ const reject = msg => {
 };
 
 // Guard factories
-const makeRoleGuard = roleId => {
+export const makeRoleGuard = roleId => {
     return msg => {
         // Must be in guild
         if (!msg.guild) return false;
@@ -43,7 +43,7 @@ const makeRoleGuard = roleId => {
     };
 };
 
-const makePermissionGuard = rawPerm => {
+export const makePermissionGuard = rawPerm => {
     return msg => {
         // Must be in guild
         if (!msg.guild) return false;
@@ -56,7 +56,7 @@ const makePermissionGuard = rawPerm => {
     };
 };
 
-const ownerGuard = msg => {
+export const ownerGuard = msg => {
     if (msg.author.id === process.env.OWNER_ID) {
         return true;
     } else {
@@ -65,32 +65,17 @@ const ownerGuard = msg => {
     }
 };
 
-const adminRoleGuard = makeRoleGuard(process.env.ADMIN_ROLE_ID);
+export const adminRoleGuard = makeRoleGuard(process.env.ADMIN_ROLE_ID);
 
 const broadcastAllowedIds = !!process.env.BROADCAST_ALLOWED_IDS
     ? process.env.BROADCAST_ALLOWED_IDS.split(',')
     : [];
-const broadcastGuard = msg => {
+
+export const broadcastGuard = msg => {
     if (broadcastAllowedIds.includes(msg.author.id)) {
         return true;
     } else {
         reject(msg);
         return false;
     }
-};
-
-module.exports = {
-    group,
-
-    userMentionToIdPattern,
-    channelMentionToIdPattern,
-    roleMentionToIdPattern,
-    booleanPattern,
-    messageLinkPattern,
-
-    ownerGuard,
-    broadcastGuard,
-    adminRoleGuard,
-    makeRoleGuard,
-    makePermissionGuard
 };

@@ -1,10 +1,10 @@
 /** @format */
 
-const Discord = require('discord.js');
-const {
+import Discord from 'discord.js';
+import {
     createInfoMessageWithTitle,
     createWarningMessage
-} = require('../messageUtils');
+} from '../messageUtils';
 
 /**
  * @param title {String}
@@ -13,7 +13,7 @@ const {
  * @param timeout {Number}
  * @return {Function<Promise<Array<String>>>}
  */
-const newForm = (title, questions, answersMapper, timeout = 6000) => {
+export const newForm = (title, questions, answersMapper, timeout = 6000) => {
     return async (user, channel) => {
         const answers = [];
 
@@ -84,8 +84,4 @@ const askQuestion = async (
     }
 
     return validResponse;
-};
-
-module.exports = {
-    newForm
 };
