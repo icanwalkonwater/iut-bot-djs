@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Copy this file under .git/hooks/pre-commit to use it.
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m' # No Color
+
+echo -e "${YELLOW}⌛${NC} Running rustfmt ..."
+cargo fmt --message-format human -- --color always --check --files-with-diff
+
+if [ "$?" != '0' ]; then
+	>&2 echo -e "${RED}⚠️ Formatting issue detected in the files above !${NC}"
+	>&2 echo -e "${RED}⚠️ You can fix by running \`cargo fmt\`${NC}"
+	exit 1
+else
+	echo -e "${GREEN}✔️${NC} Rustfmt ok"
+fi
